@@ -64,8 +64,12 @@ Este proyecto consiste en una API que permite gestionar apartamentos y reservas 
    - `propietario_id` : Nuevo ID del propietario del apartamento.
 
    **Ejemplo de solicitud**:
-   ```json
+
+   ```text
    PUT /apartamentos/1
+   ```
+
+   ```json
    {
      "direccion": "Carrer de Pau Claris 99",
      "precio": 1700,
@@ -91,8 +95,12 @@ Este proyecto consiste en una API que permite gestionar apartamentos y reservas 
    - `estado` : El estado de la reserva. Puede ser `pendiente`, `confirmado` o `cancelado`.
 
    **Ejemplo de solicitud**:
-   ```json
+
+   ```text
    POST /reservas
+   ```
+
+   ```json
    {
      "apartamento_id": 1,
      "usuario_id": 2,
@@ -121,7 +129,7 @@ Este proyecto consiste en una API que permite gestionar apartamentos y reservas 
    - `id` : El ID de la reserva que deseas eliminar.
 
    **Ejemplo de solicitud**:
-   ```json
+   ```text
    DELETE /reservas/1
    ```
 4. **Actualizar Reserva**  
@@ -139,11 +147,16 @@ Este proyecto consiste en una API que permite gestionar apartamentos y reservas 
    - `estado` : Nuevo estado de la reserva. Puede ser `pendiente`, `confirmado` o `cancelado`.
 
    **Ejemplo de solicitud**:
-   ```json
+
+   ```text
    PUT /reservas/1
+   ```
+
+   ```json
    {
      "fecha_inicio": "2024-12-05",
      "fecha_fin": "2024-12-12",
      "estado": "confirmado"
    }
    ```
+   
