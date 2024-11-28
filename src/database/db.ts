@@ -22,8 +22,8 @@ export const connectDB = async () => {
       baños INTEGER NOT NULL,
       precio DECIMAL(10, 2) NOT NULL CHECK(precio >= 0),
       estado TEXT CHECK(estado IN ('disponible', 'alquilado', 'reservado')) DEFAULT 'disponible',
-      propietario_id INTEGER NOT NULL,
-      FOREIGN KEY (propietario_id) REFERENCES users(id) ON DELETE CASCADE
+      descripcion TEXT,
+      propietario_id INTEGER NOT NULL
     );
 
     CREATE TABLE IF NOT EXISTS reservas (
@@ -33,8 +33,14 @@ export const connectDB = async () => {
       fecha_inicio TEXT NOT NULL,
       fecha_fin TEXT NOT NULL,
       estado TEXT CHECK(estado IN ('pendiente', 'confirmado', 'cancelado')) DEFAULT 'pendiente',
-      FOREIGN KEY (apartamento_id) REFERENCES apartamentos(id) ON DELETE CASCADE,
-      FOREIGN KEY (usuario_id) REFERENCES users(id) ON DELETE CASCADE
+      FOREIGN KEY (apartamento_id) REFERENCES apartamentos(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS imagenes (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      apartamento_id INTEGER,
+      imagen TEXT,
+      descripcion TEXT
     );
   `);
   

@@ -6,6 +6,7 @@
   "scripts": {
     "testApartamentos": "mocha test/testApartamentos.js",
     "testReservas": "mocha test/testReservas.js",
+    "test": "node test/test.js",
     "server": "node dist/server.js"
   },
   "keywords": [],

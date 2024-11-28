@@ -57,6 +57,7 @@ describe('Funciones Básicas de Apartamentos', () => {
             baños: 1,
             precio: 1200,
             estado: 'disponible',
+            descripcion: 'Nuevo Apartamento', 
             propietario_id: 1,
         };
 
@@ -145,6 +146,7 @@ describe('Funciones Avanzadas de Apartamentos', () => {
                 baños INTEGER NOT NULL,
                 precio REAL NOT NULL,
                 estado TEXT CHECK(estado IN ('disponible', 'alquilado', 'reservado')) DEFAULT 'disponible',
+                descripcion TEXT,
                 propietario_id INTEGER NOT NULL
             );
         `);
@@ -167,6 +169,7 @@ describe('Funciones Avanzadas de Apartamentos', () => {
             baños: 1,
             precio: 1200,
             estado: 'disponible',
+            descripcion: 'Nuevo Apartamento', 
             propietario_id: 1,
         };
 

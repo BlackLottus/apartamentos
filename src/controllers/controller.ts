@@ -1,15 +1,19 @@
 import { connectDB } from '../database/db.js'; 
 import { Apartamento } from '../models/apartamento.js'; 
 import { Reserva } from '../models/reserva.js';
+import { Imagen } from '../models/imagen.js';
 
 var CONSULTAS = {
-    INSERT_APARTMENT : `INSERT INTO apartamentos (direccion, ciudad, pais, codigo_postal, superficie, habitaciones, baños, precio, estado, propietario_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    INSERT_APARTMENT : `INSERT INTO apartamentos (direccion, ciudad, pais, codigo_postal, superficie, habitaciones, baños, precio, estado, descripcion, propietario_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
     SELECT_APARTMENT_BY_ID : `SELECT * FROM apartamentos WHERE id = ?`,
     DELETE_APARTMENT : `DELETE FROM apartamentos WHERE id = ?`,
     INSERT_RESERVA : `INSERT INTO reservas (apartamento_id, usuario_id, fecha_inicio, fecha_fin, estado) VALUES (?, ?, ?, ?, ?)`,
     SELECT_RESERVA_BY_ID : `SELECT * FROM reservas WHERE id = ?`,
     DELETE_RESERVA : `DELETE FROM reservas WHERE id = ?`,
+    INSERT_IMAGEN : `INSERT INTO imagenes (apartamento_id, imagen, descripcion) VALUES (?, ?, ?)`,
+    SELECT_IMAGEN_BY_ID : "SELECT * FROM imagenes WHERE id = ?",
+    DELETE_IMAGEN : `DELETE FROM imagenes WHERE id = ?`,
 }
 
 /**
@@ -46,7 +50,7 @@ export const addApartamento = async (apartamento: Apartamento): Promise<void | A
 
     try {
         const newApatarmento = await db.run(CONSULTAS.INSERT_APARTMENT, [apartamento.direccion, apartamento.ciudad, apartamento.pais, apartamento.codigo_postal, apartamento.superficie,
-            apartamento.habitaciones, apartamento.baños, apartamento.precio, apartamento.estado, apartamento.propietario_id,
+            apartamento.habitaciones, apartamento.baños, apartamento.precio, apartamento.estado, apartamento.descripcion, apartamento.propietario_id,
         ]);
         const nuevoApartamento = { id: newApatarmento.lastID, ...apartamento};
         console.log("Se ha creado un nuevo apartamento con la ID: "+newApatarmento.lastID);
@@ -162,6 +166,7 @@ export const updateApartamento = async (apartamento: Apartamento, newApartamento
         if (newApartamento.habitaciones !== undefined) { campos.push("habitaciones = ?"); valores.push(newApartamento.habitaciones); }
         if (newApartamento.baños !== undefined) { campos.push("baños = ?"); valores.push(newApartamento.baños); }
         if (newApartamento.precio !== undefined) { campos.push("precio = ?"); valores.push(newApartamento.precio); }
+        if (newApartamento.descripcion !== undefined) { campos.push("descripcion = ?"); valores.push(newApartamento.descripcion); }
         if (newApartamento.propietario_id !== undefined) { campos.push("propietario_id = ?"); valores.push(newApartamento.propietario_id); }
         if (newApartamento.estado) {
             if (!['disponible', 'alquilado', 'reservado'].includes(newApartamento.estado)) {
@@ -384,3 +389,116 @@ export const updateReserva = async (id: number, newReserva: Partial<Reserva>): P
         console.error('Error al actualizar reserva:', err);
     }
 };
+
+
+/******************************/
+/*******    IMAGENES    *******/
+/******************************/
+
+/**
+ * Guarda una nueva imagen en la base de datos de la aplicación.
+ * @param datosImagen La imagen que deseas registrar.
+ */
+export const guardarImagen = async (datosImagen: Omit<Imagen, 'id'>): Promise<void> => {
+    const db = await connectDB();
+  
+    // Verificar que los datos estén completos
+    if (!datosImagen.apartamento_id || !datosImagen.imagen || !datosImagen.descripcion) {
+      console.error('Faltan datos para la inserción');
+      return;
+    }
+  
+    // Verificar que la imagen esté en formato Base64 válido
+    if (typeof datosImagen.imagen !== 'string' || datosImagen.imagen.length === 0) {
+      console.error('La imagen no está en formato Base64 válido');
+      return;
+    }
+  
+    // Verificar si ya existe una imagen con el mismo apartamento_id, descripcion y imagen en Base64
+    const imagenExistente = await db.get(`
+      SELECT id FROM imagenes 
+      WHERE apartamento_id = ? AND imagen = ?
+    `, [datosImagen.apartamento_id, datosImagen.imagen]);
+  
+    if (imagenExistente) {
+      console.log('Ya existe una esa imagen para ese apartamento_id en la base de datos.');
+      return; // Evitamos insertar la imagen si ya existe
+    }
+  
+    // Insertar la imagen en la base de datos
+    await db.run(`
+      INSERT INTO imagenes (apartamento_id, imagen, descripcion)
+      VALUES (?, ?, ?)
+    `, [datosImagen.apartamento_id, datosImagen.imagen, datosImagen.descripcion]);
+  
+    console.log('Imagen guardada exitosamente');
+  };
+
+
+  // Recoge una imagen de la base de datos por su ID.
+  export const getImagenById = async (id: number): Promise<Imagen | null> => {
+    const db = await connectDB();
+
+    // Recuperar la imagen desde la base de datos por id
+    const result = await db.get(`
+      SELECT id, apartamento_id, imagen, descripcion
+      FROM imagenes
+      WHERE id = ?
+    `, [id]);
+  
+    if (!result) {
+      console.error('Imagen no encontrada');
+      return null;
+    }
+  
+    console.log('Imagen recuperada:', result);
+    return result as Imagen;
+  };
+  
+ /**
+ * Obtiene todas las imagenes almacenadas en la base de datos.
+ * await listImagenes({ id: 1 });
+ */
+  export const listImagenes = async (apartamento_id?: number): Promise<Imagen[]> => {
+    const db = await connectDB();
+  
+    let query = `
+      SELECT id, apartamento_id, imagen, descripcion
+      FROM imagenes
+    `;
+    
+    let params: (number | undefined)[] = [];
+  
+    if (apartamento_id) {
+      query += ` WHERE apartamento_id = ?`;
+      params.push(apartamento_id);
+    }
+  
+    // Recuperar las imágenes (con o sin filtro de apartamento_id)
+    const results = await db.all(query, params);
+  
+    if (results.length === 0) {
+      console.log('No se encontraron imágenes');
+    } else {
+      console.log(`Se encontraron ${results.length} imágenes`);
+    }
+  
+    return results as Imagen[];
+  };
+
+  // Eliminar la imagen de la base de datos.
+  export const deleteImage = async (id: number): Promise<void> => {
+    const db = await connectDB();
+  
+    // Eliminar la imagen de la base de datos por su id
+    const result = await db.run(`
+      DELETE FROM imagenes
+      WHERE id = ?
+    `, [id]);
+  
+    if (result.changes === 0) {
+      console.error(`No se encontró ninguna imagen con id ${id}`);
+    } else {
+      console.log(`Imagen con id ${id} eliminada correctamente`);
+    }
+  };

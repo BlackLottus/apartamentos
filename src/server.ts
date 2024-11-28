@@ -2,17 +2,11 @@ import express from 'express';
 import { Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import {
-  addApartamento,
-  listApartamentos,
-  updateApartamento,
-  deleteApartamento,
-  addReserva,
-  listReservas,
-  deleteReserva,
-  getReservaId,
-  updateReserva,
-  getApartamentoById
+  addApartamento,listApartamentos, updateApartamento, deleteApartamento, getApartamentoById,
+  addReserva, listReservas, deleteReserva, getReservaId, updateReserva,
+  guardarImagen, listImagenes, getImagenById, deleteImage
 } from './controllers/controller.js'; 
+import { Imagen } from './models/imagen.js'; // Ajusta el path
 
 const app = express();
 const PORT = 3000;
@@ -199,6 +193,69 @@ app.post('/reservas/add', async (req, res) => {
       }
   });
 
+
+/*********************/
+/*     IMAGENES     */
+/*******************/
+// Endpoint para guardar una imagen
+app.post('/apartamentos/:id_apartamento/imagenes', async (req: Request, res: Response) => {
+  try {
+    const datosImagen: Omit<Imagen, 'id'> = { 
+      ...req.body, 
+      apartamento_id: parseInt(req.params.id_apartamento, 10) 
+    };
+    await guardarImagen(datosImagen);
+    res.status(201).json({ message: 'Imagen guardada exitosamente' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error al guardar la imagen' });
+  }
+});
+
+// Endpoint para obtener una imagen por su ID
+app.get('/apartamentos/:id_apartamento/imagenes/:imagen_id', async (req: Request, res: Response) => {
+  try {
+    const imagen_id = parseInt(req.params.imagen_id, 10);
+    const imagen = await getImagenById(imagen_id);
+    if (imagen) {
+      res.status(200).json(imagen);
+    } else {
+      res.status(404).json({ message: 'Imagen no encontrada' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error al obtener la imagen' });
+  }
+});
+
+// Endpoint para listar todas las imágenes, con filtro opcional por apartamento_id
+app.get('/apartamentos/:apartamento_id/imagenes', async (req: Request, res: Response) => {
+  try {
+    const apartamento_id = parseInt(req.params.apartamento_id, 10);  // Usamos el id del apartamento de la URL
+    const imagenes = await listImagenes(apartamento_id);
+    res.status(200).json(imagenes);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error al listar las imágenes' });
+  }
+});
+
+// Endpoint para eliminar una imagen por su ID
+app.delete('/apartamentos/:apartamento_id/imagenes/:imagen_id', async (req: Request, res: Response) => {
+  try {
+    const imagen_id = parseInt(req.params.imagen_id, 10);
+    await deleteImage(imagen_id);
+    res.status(200).json({ message: `Imagen con id ${imagen_id} eliminada correctamente` });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Error al eliminar la imagen' });
+  }
+});
+
+
+/***************/
+/** Servidor **/
+/*************/
 
 // Iniciar el servidor
 app.listen(PORT, () => {

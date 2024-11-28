@@ -9,6 +9,7 @@ export interface Apartamento {
     baños: number;
     precio: number;
     estado: 'disponible' | 'alquilado' | 'reservado';
+    descripcion: string;
     propietario_id: number;
   }
     
