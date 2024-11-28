@@ -95,7 +95,7 @@ import { readFileSync, writeFileSync } from 'fs';
           const db = await connectDB(); // Conexión a la base de datos
       
           // Leer la imagen y convertirla a Base64
-          const rutaImagen = './imagenes/descarga.jpg';  // Ruta de la imagen en tu sistema
+          const rutaImagen = './imagenes/imagenPrueba.jpg';  // Ruta de la imagen en tu sistema
           const bufferImagen = readFileSync(rutaImagen);
           const base64Imagen = bufferImagen.toString('base64');  // Convertir el Buffer a Base64
           //console.log(base64Imagen);  // Verifica que es un string Base64
