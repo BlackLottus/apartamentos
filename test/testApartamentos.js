@@ -34,7 +34,7 @@ describe('Funciones Básicas de Apartamentos', () => {
                 habitaciones INTEGER NOT NULL,
                 baños INTEGER NOT NULL,
                 precio REAL NOT NULL,
-                estado TEXT CHECK(estado IN ('disponible', 'alquilado', 'reservado')) DEFAULT 'disponible',
+                estado TEXT CHECK(estado IN ('disponible', 'alquilado', 'reservado', 'inactivo')) DEFAULT 'disponible',
                 propietario_id INTEGER NOT NULL
             );
         `);
@@ -77,7 +77,7 @@ describe('Funciones Básicas de Apartamentos', () => {
         // Primero, obtén el apartamento que vas a actualizar
         const apartamentos = await listApartamentos();
         const apartamento = apartamentos[0];
-    
+
         // Asegúrate de que el apartamento existe
         expect(apartamento).to.exist;
 
@@ -96,7 +96,7 @@ describe('Funciones Básicas de Apartamentos', () => {
         };
     
         // Llama a la función `updateApartamento` pasando el apartamento original y el nuevo objeto con los cambios
-        await updateApartamento(apartamento, nuevosDatosApartamento);
+        await updateApartamento(apartamento.id, nuevosDatosApartamento);
     
         // Verifica que los datos del apartamento se hayan actualizado correctamente
         const apartamentosActualizados = await listApartamentos();
@@ -145,7 +145,7 @@ describe('Funciones Avanzadas de Apartamentos', () => {
                 habitaciones INTEGER NOT NULL,
                 baños INTEGER NOT NULL,
                 precio REAL NOT NULL,
-                estado TEXT CHECK(estado IN ('disponible', 'alquilado', 'reservado')) DEFAULT 'disponible',
+                estado TEXT CHECK(estado IN ('disponible', 'alquilado', 'reservado', 'inactivo')) DEFAULT 'disponible',
                 descripcion TEXT,
                 propietario_id INTEGER NOT NULL
             );
@@ -247,7 +247,7 @@ describe('Funciones Avanzadas de Apartamentos', () => {
             estado: 'reservado', // Cambia el estado
         };
 
-        await updateApartamento(apartamento, nuevosDatosApartamento);
+        await updateApartamento(apartamento.id, nuevosDatosApartamento);
 
         // Verificar que los datos se hayan actualizado
         const apartamentosActualizados = await listApartamentos();
@@ -265,7 +265,7 @@ describe('Funciones Avanzadas de Apartamentos', () => {
             precio: 9999,
         };
 
-        await updateApartamento(apartamentoInexistente, nuevosDatosApartamento);
+        await updateApartamento(apartamentoInexistente.id, nuevosDatosApartamento);
         
         const apartamentos = await listApartamentos();
         expect(apartamentos).to.have.lengthOf(0);  // No debe haber cambios

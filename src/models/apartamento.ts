@@ -8,8 +8,8 @@ export interface Apartamento {
     habitaciones: number;
     baños: number;
     precio: number;
-    estado: 'disponible' | 'alquilado' | 'reservado';
+    estado: 'disponible' | 'alquilado' | 'reservado'  | 'inactivo';
     descripcion: string;
     propietario_id: number;
-  }
+}
     

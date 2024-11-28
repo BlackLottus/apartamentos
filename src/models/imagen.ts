@@ -3,5 +3,5 @@ export interface Imagen {
     imagen: string;
     descripcion: string;
     apartamento_id: number;
-  }
+}
     

@@ -1,5 +1,5 @@
 import { connectDB } from '../dist/database/db.js'; 
-import { addReserva, listReservas, removeReserva, updateReserva } from '../dist/index.js';
+import { addReserva, listReservas, deleteReserva, updateReserva } from '../dist/index.js';
 import { expect } from 'chai';
 import sinon from 'sinon';
 
@@ -10,11 +10,12 @@ before(async () => {
     await db.run(`
         CREATE TABLE IF NOT EXISTS reservas (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            id_apartamento INTEGER NOT NULL,
-            id_usuario INTEGER NOT NULL,
+            apartamento_id INTEGER NOT NULL,
+            usuario_id INTEGER NOT NULL,
             fecha_inicio TEXT NOT NULL,
             fecha_fin TEXT NOT NULL,
-            estado TEXT CHECK(estado IN ('pendiente', 'confirmado', 'cancelado')) DEFAULT 'pendiente'
+            estado TEXT CHECK(estado IN ('pendiente', 'confirmado', 'cancelado', 'expirado')) DEFAULT 'pendiente',
+            FOREIGN KEY (apartamento_id) REFERENCES apartamentos(id) ON DELETE CASCADE
         )
     `);
 });
@@ -53,8 +54,8 @@ describe('Test de Funciones Principales de Reservas', () => {
         const reservas = await listReservas();
         expect(reservas).to.have.lengthOf(1);
         expect(reservas[0]).to.include({
-            id_apartamento: 1,
-            id_usuario: 2,
+            apartamento_id: 1,
+            usuario_id: 2,
             fecha_inicio: '2024-11-25',
             fecha_fin: '2024-11-30',
             estado: 'pendiente',
@@ -76,8 +77,8 @@ describe('Test de Funciones Principales de Reservas', () => {
         expect(reservas[0].estado).to.equal('confirmado');
     });
 
-    it('removeReserva debe eliminar una reserva por su ID', async () => {
-        await removeReserva(reservaId);
+    it('deleteReserva debe eliminar una reserva por su ID', async () => {
+        await deleteReserva(reservaId);
 
         const reservas = await listReservas();
         expect(reservas).to.be.empty;
@@ -117,8 +118,8 @@ describe('Test de Funciones Especifícadas de Reservas', () => {
         const reservas = await listReservas();
         expect(reservas).to.have.lengthOf(1);
         expect(reservas[0]).to.include({
-            id_apartamento: 1,
-            id_usuario: 2,
+            apartamento_id: 1,
+            usuario_id: 2,
             fecha_inicio: '2024-11-25',
             fecha_fin: '2024-11-30',
             estado: 'pendiente',
@@ -156,7 +157,7 @@ describe('Test de Funciones Especifícadas de Reservas', () => {
         expect(reservasConfirmadas[0].estado).to.equal('confirmado');
 
         reservaId2 = reservasConfirmadas[0].id;
-        await removeReserva(reservaId2);
+        await deleteReserva(reservaId2);
     });
 
     it('updateReserva debe actualizar solo los campos proporcionados', async () => {
@@ -177,24 +178,24 @@ describe('Test de Funciones Especifícadas de Reservas', () => {
         }
     });
 
-    it('removeReserva debe eliminar una reserva existente', async () => {
-        await removeReserva(reservaId2);
+    it('deleteReserva debe eliminar una reserva existente', async () => {
+        await deleteReserva(reservaId2);
 
         const reservas = await listReservas();
         expect(reservas).to.have.lengthOf(1);
         expect(reservas[0].id).to.equal(reservaId1);
     });
 
-    it('removeReserva debe fallar si el ID no existe', async () => {
+    it('deleteReserva debe fallar si el ID no existe', async () => {
         try {
-            await removeReserva(9999);
+            await deleteReserva(9999);
         } catch (error) {
             expect(error.message).to.include('No rows deleted');
         }
     });
 
     it('listReservas debe devolver una lista vacía si no hay reservas', async () => {
-        await removeReserva(reservaId1);
+        await deleteReserva(reservaId1);
 
         const reservas = await listReservas();
         expect(reservas).to.be.empty;

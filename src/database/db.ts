@@ -21,7 +21,7 @@ export const connectDB = async () => {
       habitaciones INTEGER NOT NULL,
       baños INTEGER NOT NULL,
       precio DECIMAL(10, 2) NOT NULL CHECK(precio >= 0),
-      estado TEXT CHECK(estado IN ('disponible', 'alquilado', 'reservado')) DEFAULT 'disponible',
+      estado TEXT CHECK(estado IN ('disponible', 'alquilado', 'reservado', 'inactivo')) DEFAULT 'disponible',
       descripcion TEXT,
       propietario_id INTEGER NOT NULL
     );
@@ -32,7 +32,7 @@ export const connectDB = async () => {
       usuario_id INTEGER NOT NULL,
       fecha_inicio TEXT NOT NULL,
       fecha_fin TEXT NOT NULL,
-      estado TEXT CHECK(estado IN ('pendiente', 'confirmado', 'cancelado')) DEFAULT 'pendiente',
+      estado TEXT CHECK(estado IN ('pendiente', 'confirmado', 'cancelado', 'expirado')) DEFAULT 'pendiente',
       FOREIGN KEY (apartamento_id) REFERENCES apartamentos(id) ON DELETE CASCADE
     );
 
