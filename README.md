@@ -22,6 +22,7 @@ Este proyecto consiste en una API que permite gestionar apartamentos y reservas 
      "baños": 3,
      "precio": 1500,
      "estado": "disponible",
+     "descripcion": "Gran Apartamento en el centro",
      "propietario_id": 2
    }
 
@@ -60,7 +61,8 @@ Este proyecto consiste en una API que permite gestionar apartamentos y reservas 
    - `habitaciones` : Nuevas habitaciones del apartamento.
    - `baños` : Nuevos baños del apartamento.
    - `precio` : Nuevo precio del apartamento.
-   - `estado` : Nuevo estado del apartamento. Puede ser `disponible`, `alquilado`, o `reservado`.
+   - `estado` : Nuevo estado del apartamento. Puede ser `disponible`, `alquilado`, `reservado`, o `inactivo`.
+   - `descripcion` : Nueva descripción para el apartamento.
    - `propietario_id` : Nuevo ID del propietario del apartamento.
 
    **Ejemplo de solicitud**:
@@ -81,6 +83,10 @@ Este proyecto consiste en una API que permite gestionar apartamentos y reservas 
 
    **Parámetros de ruta**:
    - `id` : El ID del apartamento que deseas eliminar.
+  
+   **Recomendaciones**:
+   - Evitar eliminar información referente a los apartamentos. Siempre será mejor colocarlo como `inactivo` con un `update`.
+   - Solamente eliminar algún apartamento cuando ya no sea necesario o no haya más opciones.
 
 ### Reservas
 1. **Añadir Reserva**  
@@ -92,7 +98,7 @@ Este proyecto consiste en una API que permite gestionar apartamentos y reservas 
    - `usuario_id` : El ID del usuario que realiza la reserva.
    - `fecha_inicio` : La fecha de inicio de la reserva (formato: `YYYY-MM-DD`).
    - `fecha_fin` : La fecha de fin de la reserva (formato: `YYYY-MM-DD`).
-   - `estado` : El estado de la reserva. Puede ser `pendiente`, `confirmado` o `cancelado`.
+   - `estado` : El estado de la reserva. Puede ser `pendiente`, `confirmado`, `cancelado` o `expirado`.
 
    **Ejemplo de solicitud**:
 
@@ -132,6 +138,10 @@ Este proyecto consiste en una API que permite gestionar apartamentos y reservas 
    ```text
    DELETE /reservas/1
    ```
+   **Recomendaciones**:
+   - Evitar eliminar información referente a las reservas. Siempre será mejor colocarla como `expirado` con un `update`.
+   - Solamente eliminar alguna reserva cuando ya no sea necesaria o no haya más opciones.
+
 4. **Actualizar Reserva**  
    `PUT /reservas/:id`  
    Actualiza los datos de una reserva específica mediante su ID.
@@ -144,7 +154,7 @@ Este proyecto consiste en una API que permite gestionar apartamentos y reservas 
 
    - `fecha_inicio` : Nueva fecha de inicio de la reserva.
    - `fecha_fin` : Nueva fecha de fin de la reserva.
-   - `estado` : Nuevo estado de la reserva. Puede ser `pendiente`, `confirmado` o `cancelado`.
+   - `estado` : Nuevo estado de la reserva. Puede ser `pendiente`, `confirmado`, `cancelado` o `expirado`.
 
    **Ejemplo de solicitud**:
 
@@ -158,5 +168,51 @@ Este proyecto consiste en una API que permite gestionar apartamentos y reservas 
      "fecha_fin": "2024-12-12",
      "estado": "confirmado"
    }
+   ```
+### Imagenes
+1. **Añadir Imagen**  
+   `POST /apartamentos/:apartamento_id/imagenes`  
+   Crea una nueva reserva para un apartamento.
+
+   **Parámetros de ruta**:
+   - `apartamento_id` : El ID del apartamento donde queremos agregar la nueva imagen.
+  
+   **Cuerpo (Body)**:
+   - `imagen` : La imagen que queremos subir en String, formato base64.
+   - `descripcion` : La descripción de la imagen.
+
+   **Ejemplo de solicitud**:
+
+   ```text
+   POST /apartamentos/1/imagenes
+   ```
+
+   ```json
+   {
+     "imagen": "321asd4AAQSkZJRgABAQAAAQABAA",
+     "descripcion": "Imagen de prueba para apartamento 1"
+   }
+2. **Listar Imágenes**  
+   `GET /apartamentos/:apartamento_id/imagenes`  
+   Obtiene todas las imagenes de un apartamento existentes, con filtros opcionales.
+
+   **Parámetros de ruta**:
+   - `apartamento_id` : El ID del apartamento del cual queremos listar las imágenes.
+  
+    **Ejemplo de solicitud**:
+    ```text
+    GET /apartamentos/2/imagenes
+    ```
+3. **Eliminar Imagen**  
+   `DELETE /apartamentos/:apartamento_id/imagenes/:imagen_id`  
+   Elimina una reserva específica mediante su ID.
+
+   **Parámetros de ruta**:
+   - `apartamento_id` : El ID del apartamento que contiene la imagen que quieres eliminar.
+   - `imagen_id` : El ID de la imagen que quieres eliminar.
+
+   **Ejemplo de solicitud**:
+   ```text
+   DELETE /apartamentos/1/imagenes/1
    ```
    

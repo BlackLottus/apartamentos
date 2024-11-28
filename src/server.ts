@@ -48,11 +48,11 @@ app.post('/reservas/add', async (req, res) => {
 });
 
 // Añadir una imagen
-app.post('/apartamentos/:id_apartamento/imagenes', async (req: Request, res: Response) => {
+app.post('/apartamentos/:apartamento_id/imagenes', async (req: Request, res: Response) => {
   try {
     const datosImagen: Omit<Imagen, 'id'> = { 
       ...req.body, 
-      apartamento_id: parseInt(req.params.id_apartamento, 10) 
+      apartamento_id: parseInt(req.params.apartamento_id, 10) 
     };
     await addImagen(datosImagen);
     res.status(201).json({ message: 'Imagen añadida exitosamente' });
